@@ -2,49 +2,229 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Pressure Vessel Thickness Calculator</title>
+<title>Pressure Vessel Calculator | ASME BPVC</title>
+
+<meta name="description"
+content="Pressure vessel calculation aid based on ASME BPVC Section VIII Division 1. Reference only.">
 
 <style>
-body { font-family: Arial; max-width: 450px; margin: auto; padding: 20px; }
-input, button { width: 100%; padding: 8px; margin: 6px 0; }
-button { background: #0078D4; color: white; border: none; }
+body {
+  font-family: Arial, sans-serif;
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  background: #f5f6f7;
+}
+
+h1 { text-align: center; }
+
+.tabs {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px;
+  cursor: pointer;
+  text-align: center;
+  background: #e0e0e0;
+  border: 1px solid #ccc;
+}
+
+.tab.active {
+  background: #0078D4;
+  color: white;
+}
+
+.section {
+  display: none;
+  background: white;
+  padding: 20px;
+  border: 1px solid #ccc;
+}
+
+.section.active {
+  display: block;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+}
+
+input, select, button {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+}
+
+button {
+  background: #0078D4;
+  color: white;
+  border: none;
+  margin-top: 15px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #005fa3;
+}
+
+.result {
+  margin-top: 15px;
+  font-weight: bold;
+}
 </style>
 </head>
 
 <body>
 
-<h1>Pressure Vessel Thickness Calculator</h1>
+<h1>Pressure Vessel Calculation Aid</h1>
 
-<input id="P" placeholder="Design Pressure (MPa)">
-<input id="R" placeholder="Inside Radius (mm)">
-<input id="S" placeholder="Allowable Stress (MPa)">
-<input id="E" placeholder="Joint Efficiency">
-<input id="CA" placeholder="Corrosion Allowance (mm)">
+<p style="text-align:center">
+Reference only – ASME BPVC Section VIII Div 1<br>
+Final design must be verified using the official Code.
+</p>
 
-<button onclick="calculate()">Calculate</button>
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('shell')">Shell</div>
+  <div class="tab" onclick="showTab('head')">Head</div>
+  <div class="tab" onclick="showTab('mawp')">MAWP</div>
+</div>
 
-<h3 id="result"></h3>
+<!-- UNIT SELECTION -->
+<label>Pressure Unit</label>
+<select id="unit">
+  <option value="1">MPa</option>
+  <option value="0.1">bar</option>
+  <option value="0.006895">psi</option>
+</select>
+
+<!-- SHELL -->
+<div id="shell" class="section active">
+  <h3>Cylindrical Shell – Internal Pressure (UG‑27)</h3>
+
+  <label>Design Pressure, P</label>
+  <input id="P">
+
+  <label>Inside Radius, R (mm)</label>
+  <input id="R">
+
+  <label>Allowable Stress, S</label>
+  <input id="S">
+
+  <label>Joint Efficiency, E</label>
+  <input id="E">
+
+  <label>Corrosion Allowance, CA (mm)</label>
+  <input id="CA" value="0">
+
+  <button onclick="calcShell()">Calculate Shell Thickness</button>
+  <div id="shellResult" class="result"></div>
+</div>
+
+<!-- HEAD -->
+<div id="head" class="section">
+  <h3>2:1 Ellipsoidal Head (UG‑32 reference)</h3>
+
+  <label>Design Pressure, P</label>
+  <input id="PH">
+
+  <label>Inside Diameter, D (mm)</label>
+  <input id="D">
+
+  <label>Allowable Stress, S</label>
+  <input id="SH">
+
+  <label>Joint Efficiency, E</label>
+  <input id="EH">
+
+  <label>Corrosion Allowance, CA (mm)</label>
+  <input id="CAH" value="0">
+
+  <button onclick="calcHead()">Calculate Head Thickness</button>
+  <div id="headResult" class="result"></div>
+</div>
+
+<!-- MAWP -->
+<div id="mawp" class="section">
+  <h3>Maximum Allowable Working Pressure (MAWP)</h3>
+
+  <label>Provided Thickness, t (mm)</label>
+  <input id="t">
+
+  <label>Inside Radius, R (mm)</label>
+  <input id="RM">
+
+  <label>Allowable Stress, S</label>
+  <input id="SM">
+
+  <label>Joint Efficiency, E</label>
+  <input id="EM">
+
+  <button onclick="calcMAWP()">Calculate MAWP</button>
+  <div id="mawpResult" class="result"></div>
+</div>
 
 <script>
-function calculate() {
-  const P = parseFloat(document.getElementById("P").value);
-  const R = parseFloat(document.getElementById("R").value);
-  const S = parseFloat(document.getElementById("S").value);
-  const E = parseFloat(document.getElementById("E").value);
-  const CA = parseFloat(document.getElementById("CA").value) || 0;
+function showTab(id) {
+  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  event.target.classList.add("active");
+}
 
-  if (isNaN(P) || isNaN(R) || isNaN(S) || isNaN(E)) {
-    result.innerText = "Please enter all required values.";
+function getPressure(val) {
+  return Number(val) * Number(document.getElementById("unit").value);
+}
+
+// SHELL
+function calcShell() {
+  const P = getPressure(P.value);
+  const R = Number(R.value);
+  const S = Number(S.value);
+  const E = Number(E.value);
+  const CA = Number(CA.value) || 0;
+
+  const denom = S * E - 0.6 * P;
+  if (denom <= 0) {
+    shellResult.innerText = "Invalid inputs.";
     return;
   }
 
-  if (S * E <= 0.6 * P) {
-    result.innerText = "Invalid input per ASME BPVC limits.";
+  const t = (P * R) / denom + CA;
+  shellResult.innerText = "Shell thickness = " + t.toFixed(2) + " mm";
+}
+
+// HEAD
+function calcHead() {
+  const P = getPressure(PH.value);
+  const D = Number(D.value);
+  const S = Number(SH.value);
+  const E = Number(EH.value);
+  const CA = Number(CAH.value) || 0;
+
+  const denom = 2 * S * E - 0.2 * P;
+  if (denom <= 0) {
+    headResult.innerText = "Invalid inputs.";
     return;
   }
 
-  const t = (P * R) / (S * E - 0.6 * P) + CA;
-  result.innerText = "Required Thickness = " + t.toFixed(2) + " mm";
+  const t = (P * D) / denom + CA;
+  headResult.innerText = "Head thickness = " + t.toFixed(2) + " mm";
+}
+
+// MAWP
+function calcMAWP() {
+  const t = Number(t.value);
+  const R = Number(RM.value);
+  const S = Number(SM.value);
+  const E = Number(EM.value);
+
+  const P = (S * E * t) / (R + 0.6 * t);
+  mawpResult.innerText = "MAWP = " + (P / document.getElementById("unit").value).toFixed(2);
 }
 </script>
 
