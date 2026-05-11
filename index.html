@@ -1,19 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Pressure Vessel Calculation Aid</title>
+  <title>Pressure Vessel Calculator</title>
+</head>
 
-<meta name="description"
-content="Pressure vessel calculation aid based on ASME BPVC Section VIII Division 1. Reference only.">
+<body>
 
-<style>
-body {
-  font-family: Arial, sans-serif;
-  max-width: 520px;
-  margin: auto;
-  padding: 20px;
+<h2>Pressure Vessel Thickness Calculator</h2>
+
+<input id="P" placeholder="Pressure (MPa)">
+<br><br>
+<input id="R" placeholder="Radius (mm)">
+<br><br>
+<input id="S" placeholder="Allowable Stress (MPa)">
+<br><br>
+<input id="E" placeholder="Joint Efficiency">
+<br><br>
+<input id="CA" placeholder="Corrosion Allowance (mm)">
+<br><br>
+
+<button onclick="calc()">CALCULATE</button>
+
+<h3 id="out"></h3>
+
+<script>
+function calc() {
+
+  var P  = parseFloat(document.getElementById("P").value);
+  var R  = parseFloat(document.getElementById("R").value);
+  var S  = parseFloat(document.getElementById("S").value);
+  var E  = parseFloat(document.getElementById("E").value);
+  var CA = parseFloat(document.getElementById("CA").value) || 0;
+
+  if (isNaN(P) || isNaN(R) || isNaN(S) || isNaN(E)) {
+    document.getElementById("out").innerText = "ENTER ALL VALUES";
+    return;
+  }
+
+  var t = (P * R) / (S * E - 0.6 * P) + CA;
+
+  document.getElementById("out").innerText =
+    "Thickness = " + t.toFixed(2) + " mm";
 }
+</script>
 
-
-<label>Design Pressure, P (MPa)</label>
+</body>
+</html>
