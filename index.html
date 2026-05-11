@@ -2,23 +2,48 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Pressure Vessel Calculator</title>
-<link rel="stylesheet" href="style.css">
+<title>Pressure Vessel Calculation Aid</title>
+
+<meta name="description"
+content="Pressure vessel calculation aid based on ASME BPVC Section VIII Division 1. Reference only.">
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  max-width: 520px;
+  margin: auto;
+  padding: 20px;
+}
+input, button {
+  width: 100%;
+  padding: 8px;
+  margin: 6px 0;
+}
+button {
+  background: #0078D4;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+button:hover {
+  background: #005fa3;
+}
+.result {
+  margin-top: 15px;
+  font-weight: bold;
+}
+</style>
 </head>
 
 <body>
-<h1>Pressure Vessel Thickness Calculator</h1>
 
-<input id="P" placeholder="Pressure (MPa)">
-<input id="R" placeholder="Inside Radius (mm)">
-<input id="S" placeholder="Allowable Stress (MPa)">
-<input id="E" placeholder="Joint Efficiency">
-<input id="CA" placeholder="Corrosion Allowance (mm)">
+<h1>Pressure Vessel Calculation Aid</h1>
 
-<button onclick="calculate()">Calculate</button>
+<p>
+Reference only – based on ASME BPVC Section VIII Div 1.<br>
+All results must be verified using the official code.
+</p>
 
-<h3 id="result"></h3>
+<h3>Cylindrical Shell – Internal Pressure (UG‑27)</h3>
 
-<script src="script.js"></script>
-</body>
-</html>
+<label>Design Pressure, P (MPa)</label>
