@@ -2,74 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Pressure Vessel Thickness Calculator</title>
-
-<meta name="description"
-content="Pressure vessel thickness calculator based on ASME BPVC Section VIII Div 1. Estimation only.">
-
-<style>
-body { font-family: Arial, sans-serif; max-width: 480px; margin: auto; padding: 20px; }
-input, button { width: 100%; padding: 8px; margin: 6px 0; }
-button { background: #0078D4; color: white; border: none; cursor: pointer; }
-button:hover { background: #005fa3; }
-</style>
+<title>Pressure Vessel Calculator</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-
 <h1>Pressure Vessel Thickness Calculator</h1>
 
-<p>
-Engineering estimation only.<br>
-Final design must be verified using ASME BPVC.
-</p>
+<input id="P" placeholder="Pressure (MPa)">
+<input id="R" placeholder="Inside Radius (mm)">
+<input id="S" placeholder="Allowable Stress (MPa)">
+<input id="E" placeholder="Joint Efficiency">
+<input id="CA" placeholder="Corrosion Allowance (mm)">
 
-<label>Design Pressure (MPa)</label>
-<input id="P" type="number" step="any">
-
-<label>Inside Radius (mm)</label>
-<input id="R" type="number" step="any">
-
-<label>Allowable Stress (MPa)</label>
-<input id="S" type="number" step="any">
-
-<label>Joint Efficiency</label>
-<input id="E" type="number" step="any">
-
-<label>Corrosion Allowance (mm)</label>
-<input id="CA" type="number" step="any">
-
-<button id="calcBtn">Calculate</button>
+<button onclick="calculate()">Calculate</button>
 
 <h3 id="result"></h3>
 
-<script>
-document.getElementById("calcBtn").addEventListener("click", function () {
-
-  const P  = Number(document.getElementById("P").value);
-  const R  = Number(document.getElementById("R").value);
-  const S  = Number(document.getElementById("S").value);
-  const E  = Number(document.getElementById("E").value);
-  const CA = Number(document.getElementById("CA").value || 0);
-
-  const result = document.getElementById("result");
-
-  if (!P || !R || !S || !E) {
-    result.textContent = "Please enter all required values.";
-    return;
-  }
-
-  if (S * E <= 0.6 * P) {
-    result.textContent = "Invalid input: S × E must be greater than 0.6 × P.";
-    return;
-  }
-
-  const t = (P * R) / (S * E - 0.6 * P) + CA;
-
-  result.textContent =
-    "Required Thickness = " + t.toFixed(2) + " mm";
-});
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
