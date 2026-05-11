@@ -1,46 +1,50 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Pressure Vessel Calculator</title>
+<meta charset="UTF-8">
+<title>Pressure Vessel Thickness Calculator</title>
+
+<style>
+body { font-family: Arial; max-width: 450px; margin: auto; padding: 20px; }
+input, button { width: 100%; padding: 8px; margin: 6px 0; }
+button { background: #0078D4; color: white; border: none; }
+</style>
 </head>
 
 <body>
 
-<h2>Pressure Vessel Thickness Calculator</h2>
+<h1>Pressure Vessel Thickness Calculator</h1>
 
-<input id="P" placeholder="Pressure (MPa)">
-<br><br>
-<input id="R" placeholder="Radius (mm)">
-<br><br>
+<input id="P" placeholder="Design Pressure (MPa)">
+<input id="R" placeholder="Inside Radius (mm)">
 <input id="S" placeholder="Allowable Stress (MPa)">
-<br><br>
 <input id="E" placeholder="Joint Efficiency">
-<br><br>
 <input id="CA" placeholder="Corrosion Allowance (mm)">
-<br><br>
 
-<button onclick="calc()">CALCULATE</button>
+<button onclick="calculate()">Calculate</button>
 
-<h3 id="out"></h3>
+<h3 id="result"></h3>
 
 <script>
-function calc() {
-
-  var P  = parseFloat(document.getElementById("P").value);
-  var R  = parseFloat(document.getElementById("R").value);
-  var S  = parseFloat(document.getElementById("S").value);
-  var E  = parseFloat(document.getElementById("E").value);
-  var CA = parseFloat(document.getElementById("CA").value) || 0;
+function calculate() {
+  const P = parseFloat(document.getElementById("P").value);
+  const R = parseFloat(document.getElementById("R").value);
+  const S = parseFloat(document.getElementById("S").value);
+  const E = parseFloat(document.getElementById("E").value);
+  const CA = parseFloat(document.getElementById("CA").value) || 0;
 
   if (isNaN(P) || isNaN(R) || isNaN(S) || isNaN(E)) {
-    document.getElementById("out").innerText = "ENTER ALL VALUES";
+    result.innerText = "Please enter all required values.";
     return;
   }
 
-  var t = (P * R) / (S * E - 0.6 * P) + CA;
+  if (S * E <= 0.6 * P) {
+    result.innerText = "Invalid input per ASME BPVC limits.";
+    return;
+  }
 
-  document.getElementById("out").innerText =
-    "Thickness = " + t.toFixed(2) + " mm";
+  const t = (P * R) / (S * E - 0.6 * P) + CA;
+  result.innerText = "Required Thickness = " + t.toFixed(2) + " mm";
 }
 </script>
 
