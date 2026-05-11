@@ -1,52 +1,95 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Pressure Vessel Thickness Calculator</title>
+"""
+Pressure Vessel Calculation Aid
+Based on ASME BPVC Section VIII Division 1 (reference only)
 
-<style>
-body { font-family: Arial; max-width: 450px; margin: auto; padding: 20px; }
-input, button { width: 100%; padding: 8px; margin: 6px 0; }
-button { background: #0078D4; color: white; border: none; }
-</style>
-</head>
+Included:
+- Cylindrical shell thickness (internal pressure)
+- Cylindrical shell MAWP
+- 2:1 Ellipsoidal head thickness
+- Torispherical head thickness
 
-<body>
+⚠ DISCLAIMER:
+This software is a calculation aid only.
+All results must be verified against the official ASME BPVC.
+No ASME code text or tables are reproduced.
+"""
 
-<h1>Pressure Vessel Thickness Calculator</h1>
+# --------------------------------------------------
+# CYLINDRICAL SHELL – INTERNAL PRESSURE (UG-27)
+# --------------------------------------------------
 
-<input id="P" placeholder="Design Pressure (MPa)">
-<input id="R" placeholder="Inside Radius (mm)">
-<input id="S" placeholder="Allowable Stress (MPa)">
-<input id="E" placeholder="Joint Efficiency">
-<input id="CA" placeholder="Corrosion Allowance (mm)">
+def cyl_shell_thickness(P, R, S, E, CA=0.0):
+    """
+    Required minimum shell thickness
+    """
+    denominator = (S * E) - (0.6 * P)
+    if denominator <= 0:
+        raise ValueError("Invalid inputs: (S × E) must be > 0.6 × P")
 
-<button onclick="calculate()">Calculate</button>
+    t = (P * R) / denominator + CA
+    return t
 
-<h3 id="result"></h3>
 
-<script>
-function calculate() {
-  const P = parseFloat(document.getElementById("P").value);
-  const R = parseFloat(document.getElementById("R").value);
-  const S = parseFloat(document.getElementById("S").value);
-  const E = parseFloat(document.getElementById("E").value);
-  const CA = parseFloat(document.getElementById("CA").value) || 0;
+def cyl_shell_mawp(t, R, S, E):
+    """
+    Maximum Allowable Working Pressure (MAWP)
+    """
+    P = (S * E * t) / (R + 0.6 * t)
+    return P
 
-  if (isNaN(P) || isNaN(R) || isNaN(S) || isNaN(E)) {
-    result.innerText = "Please enter all required values.";
-    return;
-  }
 
-  if (S * E <= 0.6 * P) {
-    result.innerText = "Invalid input per ASME BPVC limits.";
-    return;
-  }
+# --------------------------------------------------
+# HEAD CALCULATIONS (UG-32 reference)
+# --------------------------------------------------
 
-  const t = (P * R) / (S * E - 0.6 * P) + CA;
-  result.innerText = "Required Thickness = " + t.toFixed(2) + " mm";
-}
-</script>
+def ellipsoidal_head_thickness(P, D, S, E, CA=0.0):
+    """
+    2:1 Ellipsoidal Head Thickness
+    """
+    denominator = (2 * S * E) - (0.2 * P)
+    if denominator <= 0:
+        raise ValueError("Invalid inputs for ellipsoidal head")
 
-</body>
-</html>
+    t = (P * D) / denominator + CA
+    return t
+
+
+def torispherical_head_thickness(P, D, S, E, CA=0.0):
+    """
+    Torispherical Head Thickness
+    """
+    denominator = (S * E) - (0.1 * P)
+    if denominator <= 0:
+        raise ValueError("Invalid inputs for torispherical head")
+
+    t = (0.885 * P * D) / denominator + CA
+    return t
+
+
+# --------------------------------------------------
+# EXAMPLE RUN
+# --------------------------------------------------
+
+if __name__ == "__main__":
+
+    # Design inputs (units must be consistent)
+    P = 1.6     # Design pressure
+    D = 1000    # Inside diameter (mm)
+    R = D / 2
+    S = 138     # Allowable stress
+    E = 0.85    # Joint efficiency
+    CA = 1.5    # Corrosion allowance (mm)
+
+    # Shell
+    t_shell = cyl_shell_thickness(P, R, S, E, CA)
+    mawp_shell = cyl_shell_mawp(t_shell - CA, R, S, E)
+
+    # Heads
+    t_ellip = ellipsoidal_head_thickness(P, D, S, E, CA)
+    t_tori = torispherical_head_thickness(P, D, S, E, CA)
+
+    print("=== PRESSURE VESSEL CALCULATION RESULT ===")
+    print(f"Cylindrical shell thickness : {t_shell:.2f} mm")
+    print(f"Cylindrical shell MAWP      : {mawp_shell:.2f}")
+    print(f"Ellipsoidal head thickness  : {t_ellip:.2f} mm")
+    print(f"Torispherical head thickness: {t_tori:.2f} mm")
