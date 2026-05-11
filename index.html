@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pressure Vessel Thickness Calculator | ASME BPVC</title>
+
+  <meta name="description"
+  content="Free pressure vessel thickness calculator based on ASME BPVC Section VIII Div 1. Engineering estimate only.">
+
+  <style>
+    body { font-family: Arial; max-width: 480px; margin: auto; padding: 20px; }
+    input, button { width: 100%; padding: 8px; margin: 6px 0; }
+    button { background: #0078D4; color: white; border: none; }
+  </style>
+</head>
+
+<body>
+
+<h1>Pressure Vessel Thickness Calculator</h1>
+
+<p>
+Based on ASME BPVC Section VIII Div 1.<br>
+For estimation only — final design must be verified by a licensed engineer.
+</p>
+
+<input id="P" placeholder="Design Pressure (MPa)">
+<input id="R" placeholder="Inside Radius (mm)">
+<input id="S" placeholder="Allowable Stress (MPa)">
+<input id="E" placeholder="Joint Efficiency">
+<input id="CA" placeholder="Corrosion Allowance (mm)">
+
+<button onclick="calculate()">Calculate</button>
+
+<h3 id="result"></h3>
+
+<script>
+function calculate() {
+  let P = parseFloat(P.value);
+  let R = parseFloat(R.value);
+  let S = parseFloat(S.value);
+  let E = parseFloat(E.value);
+  let CA = parseFloat(CA.value) || 0;
+
+  if (S * E <= 0.6 * P) {
+    result.innerHTML = "Invalid input per ASME BPVC limits";
+    return;
+  }
+
+  let t = (P * R) / (S * E - 0.6 * P) + CA;
+  result.innerHTML = "Required Thickness = " + t.toFixed(2) + " mm";
+}
+</script>
+
+</body>
+</html>
